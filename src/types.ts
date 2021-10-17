@@ -14,6 +14,12 @@ export enum SpokenLanguage {
 	ENGLISH = 'en',
 }
 
+export enum HttpStatus {
+	OK = 200,
+	Unauthorized = 401,
+	InternalServerError = 500,
+}
+
 export type GithubRepoResult = {
 	author: string | null;
 	name: string | null;
