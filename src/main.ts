@@ -11,7 +11,7 @@ import { buildResponse } from "./util.ts";
 export const main = async (): Promise<void> => {
   const repos = await fetchRepos(
     ProgrammingLanguage.TYPE_SCRIPT,
-    TrendingDuration.MONTHLY,
+    TrendingDuration.DAILY,
     SpokenLanguage.ENGLISH,
   );
   await processRepos(repos);
