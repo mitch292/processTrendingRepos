@@ -25,7 +25,7 @@ export const handleRequest = async (request: Request) => {
   const bearerToken = request.headers.get("authorization");
   if (
     !bearerToken ||
-    bearerToken.split("Bearer ").length > 1 ||
+    bearerToken.split("Bearer ").length < 2 ||
     bearerToken.split("Bearer ")[1] !== Deno.env.get("API_TOKEN")
   ) {
     return buildResponse("Not Authorized!", HttpStatus.Unauthorized);
