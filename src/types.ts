@@ -30,7 +30,10 @@ export type GithubRepoResult = {
 };
 
 export type FaunaRepo = GithubRepoResult & {
-  id: string;
+  internalId: string;
   twitterHandle: string | null;
   hashtags: string[];
+  lastTrendingDate: string; // iso format string
+  lastTweetDate?: string; // iso format string
+  optedOut?: boolean;
 };

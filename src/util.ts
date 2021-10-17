@@ -10,7 +10,7 @@ export const convertGitHubRepoToFaunaModel = (
   uniqueId: string,
 ): FaunaRepo => {
   return {
-    id: uniqueId,
+    internalId: uniqueId,
     name: repo.name,
     repoUrl: repo.repoUrl,
     programmingLanguage: repo.programmingLanguage,
@@ -20,6 +20,7 @@ export const convertGitHubRepoToFaunaModel = (
     description: repo.description,
     twitterHandle: null,
     hashtags: [],
+    lastTrendingDate: (new Date()).toISOString(),
   };
 };
 

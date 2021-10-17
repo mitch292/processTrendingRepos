@@ -1,14 +1,95 @@
 import { FaunaRepo } from "./types.ts";
 import { DUPLICATE_REPO_CODE, FAUNA_GRAPHQL_API } from "./config.ts";
 
-const queryFauna = async (query: string, repo: FaunaRepo): Promise<void> => {
+export const createRepoInFauna = async (repo: FaunaRepo): Promise<void> => {
+  const query = `
+    mutation createRepo($data: RepoInput!) {
+      createRepo(data: $data) {
+        _id
+        internalId
+        author
+        name
+        repoUrl
+        stars
+        spokenLanguage
+        description
+        twitterHandle
+        programmingLanguage
+        hashtags
+        lastTrendingDate
+        lastTweetDate
+        optedOut
+      }
+    }
+  `;
+
+  try {
+    const { error } = await makeFaunaRequest(query, { data: repo });
+
+    if (error) {
+      if (error.extensions.code === DUPLICATE_REPO_CODE) {
+        await updateRepoInFauna(repo);
+      } else {
+        throw error;
+      }
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateRepoInFauna = async (repo: FaunaRepo): Promise<void> => {
+  const faunaId = await findFaunaRepoIdByInternalId(repo);
+
+  const query = `
+    mutation updateRepo($id: ID!, $data: RepoInput!) {
+      updateRepo(id: $id, data: $data) {
+        _id
+      }
+    }
+  `;
+
+  await makeFaunaRequest(query, {
+    id: faunaId,
+    data: repo,
+  });
+};
+
+// @ts-ignore dont know the types that will be returned by fauna
+const findFaunaRepoIdByInternalId = async (
+  repo: FaunaRepo,
+): Promise<string> => {
+  const query = `
+    query findByInternalId($internalId: String!) {
+      repoByInternalId(internalId: $internalId) {
+        _id
+      }
+    }
+  `;
+
+  const { data, error } = await makeFaunaRequest(query, {
+    internalId: repo.internalId,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data.repoByInternalId._id;
+};
+
+const makeFaunaRequest = async (
+  query: string,
+  variables: { [key: string]: unknown },
+  // @ts-ignore dont know the types that will be returned by fauna
+  // deno-lint-ignore no-explicit-any
+): Promise<{ data?: any; error?: any }> => {
   // Grab the secret from the environment.
   const token = Deno.env.get("FAUNA_SECRET");
   if (!token) {
     throw new Error("environment variable FAUNA_SECRET not set");
   }
 
-  console.log(repo.id);
   try {
     // Make a POST request to fauna's graphql endpoint
     const res = await fetch(FAUNA_GRAPHQL_API, {
@@ -19,33 +100,19 @@ const queryFauna = async (query: string, repo: FaunaRepo): Promise<void> => {
       },
       body: JSON.stringify({
         query,
-        variables: { data: repo },
+        variables,
       }),
     });
 
     const { data, errors } = await res.json();
 
-    console.log(data, errors);
-
     if (errors) {
-      if (errors[0].extensions.code === DUPLICATE_REPO_CODE) {
-        return;
-      }
+      // Return the first error if there are any.
+      return { data, error: errors[0] };
     }
+
+    return { data };
   } catch (error) {
-    throw error;
+    return { error };
   }
-};
-
-export const createRepoInFauna = async (repo: FaunaRepo): Promise<void> => {
-  console.log(repo.name);
-  const query = `
-		mutation createRepo($data: RepoInput!) {
-			createRepo(data: $data) {
-				id
-			}
-		}
-	`;
-
-  await queryFauna(query, repo);
 };
