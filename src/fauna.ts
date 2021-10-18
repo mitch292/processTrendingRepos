@@ -1,5 +1,5 @@
 import { FaunaRepo } from "./types.ts";
-import { DUPLICATE_REPO_CODE, FAUNA_GRAPHQL_API } from "./config.ts";
+import { DUPLICATE_REPO_CODE, FAUNA_GRAPHQL_API, FAUNA_SECRET } from "./config.ts";
 
 export const createRepoInFauna = async (repo: FaunaRepo): Promise<void> => {
   const query = `
@@ -85,8 +85,7 @@ const makeFaunaRequest = async (
   // deno-lint-ignore no-explicit-any
 ): Promise<{ data?: any; error?: any }> => {
   // Grab the secret from the environment.
-  const token = Deno.env.get("FAUNA_SECRET");
-  if (!token) {
+  if (!FAUNA_SECRET) {
     throw new Error("environment variable FAUNA_SECRET not set");
   }
 
@@ -95,7 +94,7 @@ const makeFaunaRequest = async (
     const res = await fetch(FAUNA_GRAPHQL_API, {
       method: "POST",
       headers: {
-        authorization: `Bearer ${token}`,
+        authorization: `Bearer ${FAUNA_SECRET}`,
         "content-type": "application/json",
       },
       body: JSON.stringify({

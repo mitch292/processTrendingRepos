@@ -7,6 +7,7 @@ import {
 } from "./types.ts";
 import { processRepos } from "./processRepos.ts";
 import { buildResponse } from "./util.ts";
+import { API_TOKEN } from './config.ts';
 
 export const main = async (): Promise<void> => {
   const repos = await fetchRepos(
@@ -17,16 +18,12 @@ export const main = async (): Promise<void> => {
   await processRepos(repos);
 };
 
-if (import.meta.main) {
-  await main();
-}
-
 export const handleRequest = async (request: Request) => {
   const bearerToken = request.headers.get("authorization");
   if (
     !bearerToken ||
     bearerToken.split("Bearer ").length < 2 ||
-    bearerToken.split("Bearer ")[1] !== Deno.env.get("API_TOKEN")
+    bearerToken.split("Bearer ")[1] !== API_TOKEN
   ) {
     return buildResponse("Not Authorized!", HttpStatus.Unauthorized);
   }

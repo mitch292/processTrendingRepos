@@ -19,7 +19,7 @@ export const convertGitHubRepoToFaunaModel = (
     author: repo.author,
     description: repo.description,
     twitterHandle: null,
-    hashtags: [],
+    hashtags: [`#${repo.programmingLanguage}`],
     lastTrendingDate: (new Date()).toISOString(),
   };
 };
