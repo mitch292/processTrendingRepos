@@ -1,6 +1,6 @@
-# Process and Tweet Trending Repos
+# Process Trending Repos
 
-The code here represents Deno Deploy Service B.
+The code here represents Deno Deploy Service A.
 
 - [CloudFlare Scheduled Worker A](https://github.com/mitch292/scheduleTrendingRepos)
 - [CloudFlare Scheduled Worker B](https://github.com/mitch292/scheduleRepoTweets)
