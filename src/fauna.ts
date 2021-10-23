@@ -51,7 +51,7 @@ const updateRepoInFauna = async (repo: FaunaRepo): Promise<void> => {
 
   await makeFaunaRequest(query, {
     id: faunaId,
-    data: repo,
+    data: { ...repo, lastTrendingDate: (new Date).toISOString() },
   });
 };
 
